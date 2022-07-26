@@ -5,13 +5,6 @@ import { gql, useQuery } from "@apollo/client";
 import { useUser } from '@auth0/nextjs-auth0';
 import { TaskCard } from '../components/TaskCard';
 
-const UserQuery = gql`
-  query($email:String!) {
-    user(email:$email){
-      id
-    }
-  }
-`;
 
 const AllTaskQuery = gql`
 query allTasksQuery($first: Int, $after: String) {
@@ -36,31 +29,53 @@ query allTasksQuery($first: Int, $after: String) {
   }
 `
 
+const userInfo = gql`
+query fetchUser{
+   user{
+    email
+    id
+    tasklist{
+      title,
+      description
+    }
+   }
+  
+}
+`
+
 
 export default function Home() {
   const { user } = useUser();
 
-  const { data: userId } = useQuery(UserQuery, {
+  const { data, error, loading, fetchMore } = useQuery(AllTaskQuery, {
     variables: {
-      email: user?.email
+      first: 3
     }
   });
 
-  const { data, error, loading, fetchMore } = useQuery(AllTaskQuery, {
-    variables: {
-      first: 1,
-    }
-  });
+  const { data: userData } = useQuery(userInfo)
+
+  console.log(userData)
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center">
-        <h1>If you want to create a task-list, you need to Login</h1>
-        <Link href="/api/auth/login">
-          <a className=" block bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
+      <div className="h-full">
+        <div className='flex flex-col justify-center float-left w-2/3 h-full bg-gray-50'>
+    <div className='ml-32'>
+        <h1 className='font-extrabold text-left	text-transparent text-6xl bg-clip-text bg-gradient-to-r from-blue-500 to-slate-500 pb-2'>TaskList App</h1>
+        <h2 className='font-extrabold text-left	text-5xl bg-clip-text w-3/4'>Manage your tasks on a simple manner using Tasklist</h2>
+        </div>
+        </div>
+        <div className='flex flex-col justify-center items-center h-full w-1/3 bg-gray-50'>
+
+        <h1 className='font-extrabold text-9xl leading-loose drop-shadow-lg w-full text-center'>📝</h1>
+        <Link href="/api/auth/login" className='w-full text-center'>
+          <a className="block bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded  text-white font-normal text-xl">
             Login
           </a>
         </Link>
+        <p>If you don't have an account <Link href="api/auth/login"><a className='underline text-blue-500 font-semibold'>Sign up</a></Link></p>
+        </div>
       </div>
     );
   }
@@ -88,39 +103,65 @@ export default function Home() {
         />
       </Head>
       <div className="container mx-auto max-w-5xl my-20 px-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {data?.tasks.edges.map(({ node }, i) => (
-            // <Link href={`/link/${node.id}`} key={i}>
+        {/* {data?.tasks.edges.node == 'null' ? ( */}
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ">
+            {data?.tasks.edges.map(({ node }, i) => (
+              // <Link href={`/link/${node.id}`} key={i}>
+              <TaskCard
+                title={node.title}
+                category={node.category}
+                id={node.id}
+                description={node.description}
+                done={node.done}
+                key={node.id}
+              />
+              // </Link>
+            ))}
+          </div>
+          <div>
+            {hasNextPage ? (
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded my-10"
+                onClick={() => {
+                  fetchMore({
+                    variables: { after: endCursor },
+                    updateQuery: (prevResult, { fetchMoreResult }) => {
+                      fetchMoreResult.tasks.edges = [
+                        ...prevResult.tasks.edges,
+                        ...fetchMoreResult.tasks.edges
+                      ];
+                      return fetchMoreResult;
+                    }
+                  });
+                }}
+              >
+                more
+              </button>
 
-            <TaskCard
-              title={node.title}
-              category={node.category}
-              id={node.id}
-              description={node.description}
-              done={node.done}
-            />
-
-            // </Link>
-          ))}
-        </div>
-        <div>
-          {hasNextPage ? (
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded my-10"
-              onClick={() => {
-                fetchMore({
-                  variables: { after: endCursor },
-                });
-              }}
-            >
-              more
-            </button>
-          ) : (
+            ) : (
+              <p className="my-10 text-center font-medium">
+                You've reached the end!
+              </p>
+            )}
+          </div>
+        </>
+        {/* ) : (
+          <div className='md:ml-auto flex flex-wrap flex-col items-center text-base justify-center'>
             <p className="my-10 text-center font-medium">
-              You've reached the end!
+              No tasks to display
             </p>
-          )}
-        </div>
+            <div className="mr-5 capitalize bg-blue-500 py-1 px-3 rounded-md text-white text-center">
+              <Link href="/create">
+                <a>
+                  + Create
+                </a>
+              </Link>
+            </div>
+
+          </div> */}
+        {/* )} */}
+
       </div>
     </div>
   )

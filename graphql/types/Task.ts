@@ -1,5 +1,4 @@
-import { arg, booleanArg, enumType, extendType, intArg, nonNull, objectType, stringArg } from 'nexus';
-import { resolve } from 'path';
+import { arg, booleanArg, enumType, extendType, intArg, nonNull, objectType, queryType, stringArg } from 'nexus';
 import { User } from './User';
 
 export const Task = objectType({
@@ -14,23 +13,24 @@ export const Task = objectType({
         t.boolean('deleted');
         t.boolean('done');
         t.string('userId')
-        t.field('users', {
+        t.field('user', {
             type: User,
             async resolve(parent, _args, ctx) {
                 return await ctx.prisma.task
                     .findUnique({
                         where: {
                             id: parent.id,
+
                         }
                     })
-                    .users();
+                    .user();
             }
         })
     }
 })
 
 const Category = enumType({
-    name: 'Category',
+    name: 'Categories',
     members: ['WORK', 'HOME', 'OTHER']
 })
 
@@ -82,10 +82,20 @@ export const TasksQuery = extendType({
                         cursor: {
                             id: args.after, //the cursor
                         },
+                        where: {
+                            user: {
+                                email: ctx.user.email
+                            }
+                        }
                     });
                 } else {
                     queryResults = await ctx.prisma.task.findMany({
                         take: args.first,
+                        where: {
+                            user: {
+                                email: ctx.user.email
+                            }
+                        }
                     });
                 }
                 if (queryResults.length > 0) {
@@ -99,6 +109,11 @@ export const TasksQuery = extendType({
                         cursor: {
                             id: myCursor,
                         },
+                        where: {
+                            user: {
+                                email: ctx.user.email
+                            }
+                        }
                     });
 
                     const result = {
@@ -106,7 +121,7 @@ export const TasksQuery = extendType({
                             endCursor: myCursor,
                             hasNextPage: secondQueryResults.length >= args.first,
                         },
-                        edges: queryResults.map((task) => ({
+                        edges: queryResults.map(task => ({
                             cursor: task.id,
                             node: task,
                         })),
@@ -135,23 +150,17 @@ export const CreateTaskMutation = extendType({
                 title: nonNull(stringArg()),
                 category: nonNull(stringArg()),
                 description: nonNull(stringArg()),
-                userId: (stringArg()),
             },
             async resolve(_parent, args, ctx) {
                 const user = await ctx.prisma.user.findUnique({
                     where: {
-                        email: ctx.user.email,
+                        email: ctx.user.email
                     },
                 });
 
                 if (!ctx.user) {
                     throw new Error(`You need to be logged in to perform an action`)
                 }
-
-
-                const data = ctx.prisma.user.findUnique({
-                    where: ctx.user.email
-                })
 
                 const newTask = {
                     title: args.title,

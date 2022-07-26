@@ -14,10 +14,10 @@ model User {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email     String?  @unique
-  image     String?
+  email     String   @unique
   role      Role     @default(USER)
-  Task      Task[]
+  name      String?
+  tasks     Task[]
 }
 
 enum Role {
@@ -31,9 +31,9 @@ model Task {
   updatedAt   DateTime @updatedAt
   title       String
   description String
-  category    String
-  deleted     Boolean
-  done        Boolean
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
+  category    String   @default("HOME")
+  deleted     Boolean  @default(false)
+  done        Boolean  @default(false)
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
 }

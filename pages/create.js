@@ -1,7 +1,7 @@
 // pages/admin.tsx
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import toast, { Toaster } from 'react-hot-toast'
 import { getSession } from '@auth0/nextjs-auth0'
 
@@ -12,7 +12,6 @@ const CreateTaskMutation = gql`
       title
       category
       description
-      userId
     }
   }
 `
@@ -30,7 +29,7 @@ const Create = () => {
     })
 
     const onSubmit = async data => {
-        const { title, category, description, userId } = data
+        const { title, category, description } = data
         const variables = { title, category, description }
         try {
             toast.promise(createTask({ variables }), {

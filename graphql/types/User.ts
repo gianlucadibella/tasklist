@@ -1,5 +1,4 @@
-import { prisma } from "@prisma/client";
-import { enumType, nonNull, objectType, queryField, stringArg, extendType } from "nexus";
+import { enumType, nonNull, objectType, queryField, stringArg, extendType, queryType } from "nexus";
 import { Task } from './Task';
 
 export const User = objectType({
@@ -9,7 +8,7 @@ export const User = objectType({
         t.string('name');
         t.string('email');
         t.field('role', { type: Role });
-        t.list.field('tasks', {
+        t.nonNull.list.nonNull.field('tasklist', {
             type: Task,
             async resolve(parent, _args, ctx) {
                 return await ctx.prisma.user
@@ -30,22 +29,31 @@ const Role = enumType({
     members: ['USER', 'ADMIN']
 })
 
-export const UserIdByEmail = extendType({
+export const fetchUser = extendType({
     type: 'Query',
     definition(t) {
-        t.nonNull.field('user', {
-            type: 'User',
-            args: {
-                email: nonNull(stringArg())
-            },
-            async resolve(_, args, ctx) {
-                const user = await ctx.prisma.user.findUnique({
+        t.field('user', {
+            type: User,
+            resolve(parent, args, ctx) {
+                return ctx.prisma.user.findUnique({
                     where: {
-                        email: args.email,
+                        email: ctx.user.email
                     },
-                });
-                return user
-            },
-        });
-    },
-});
+                })
+            }
+        }),
+            t.field('tasklist', {
+                type: Task,
+                resolve(parent, _args, ctx) {
+                    const data = ctx.prisma.user.findUnique({
+                        where: {
+                            email: ctx.user.email
+                        },
+                    }).tasks()
+
+                    return data
+                }
+            })
+
+    }
+})

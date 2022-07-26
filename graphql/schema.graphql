@@ -2,7 +2,7 @@
 ### Do not make changes to this file directly
 
 
-enum Category {
+enum Categories {
   HOME
   OTHER
   WORK
@@ -14,7 +14,7 @@ type Edge {
 }
 
 type Mutation {
-  createTask(category: String!, description: String!, title: String!, userId: String): Task!
+  createTask(category: String!, description: String!, title: String!): Task!
 }
 
 type PageInfo {
@@ -23,8 +23,9 @@ type PageInfo {
 }
 
 type Query {
+  tasklist: Task
   tasks(after: String, first: Int): Response
-  user(email: String!): User!
+  user: User
 }
 
 type Response {
@@ -38,14 +39,14 @@ enum Role {
 }
 
 type Task {
-  category: Category
+  category: Categories
   deleted: Boolean
   description: String
   done: Boolean
   id: String
   title: String
+  user: User
   userId: String
-  users: User
 }
 
 type User {
@@ -53,5 +54,5 @@ type User {
   id: String
   name: String
   role: Role
-  tasks: [Task]
+  tasklist: [Task!]!
 }
