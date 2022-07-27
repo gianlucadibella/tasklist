@@ -5,8 +5,6 @@ import { useForm } from 'react-hook-form'
 import { gql, useMutation } from '@apollo/client';
 import toast, { Toaster } from 'react-hot-toast';
 import { getSession } from '@auth0/nextjs-auth0'
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 const EditTaskMutation = gql`
   mutation($title: String!, $category: String!, $description: String!, $id:String!, $done:Boolean) {
