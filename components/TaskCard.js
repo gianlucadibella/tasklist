@@ -10,9 +10,9 @@ export const TaskCard = ({
     id,
 }) => {
     const categoryColor = {
-        'WORK':'blue', 
-        'HOME':'orange', 
-        'OTHER':'indigo'
+        'WORK':'bg-blue-500', 
+        'HOME':'bg-orange-500', 
+        'OTHER':'bg-indigo-500'
     }
     
     return (
@@ -20,7 +20,7 @@ export const TaskCard = ({
     
     <div key={id} className={`shadow  max-w-md  rounded ${!done ? 'bg-yellow-100' : 'bg-lime-200'}`}>
                 <div className="p-5 flex flex-col space-y-2">
-                    <div className={`rounded-lg bg-${categoryColor[category]}-500 text-center w-20`}>
+                    <div className={`rounded-lg ${categoryColor[category]} text-center w-20`}>
                     <p className="text-sm font-bold text-white">{category}</p>
                     </div>
                     <p className="text-lg font-medium">{title}</p>
