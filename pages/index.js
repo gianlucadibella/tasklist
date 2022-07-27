@@ -71,7 +71,7 @@ export default function Home() {
               Login
             </a>
           </Link>
-          <p>If you don't have an account <Link href="api/auth/login"><a className='underline text-blue-500 font-semibold'>Sign up</a></Link></p>
+          <p>If you don&apost have an account <Link href="api/auth/login"><a className='underline text-blue-500 font-semibold'>Sign up</a></Link></p>
         </div>
       </div>
     );
