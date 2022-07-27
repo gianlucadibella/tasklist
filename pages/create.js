@@ -44,10 +44,11 @@ const Create = () => {
     }
 
     return (
-        <div className="container mx-auto max-w-md py-12">
-            <Toaster />
+        <div className="flex justify-center items-center h-3/4">
+           <div className='bg-slate-100 w-2/4 rounded-lg p-5 shadow-md'>
+           <Toaster />
+            <form className="grid grid-cols-1 gap-y-6 rounded-lg" onSubmit={handleSubmit(onSubmit)}>
             <h1 className="text-3xl font-medium my-5 text-center mb-2">Create a new Task</h1>
-            <form className="grid grid-cols-1 gap-y-6 shadow-lg p-8 rounded-lg bg-slate-100" onSubmit={handleSubmit(onSubmit)}>
                 <label className="block">
                     <span className="text-gray-700">Title</span>
                     <input
@@ -55,7 +56,7 @@ const Create = () => {
                         name="title"
                         type="text"
                         {...register('title', { required: true })}
-                        className="mt-1 block w-full rounded-md outline-none p-1 bg-slate-50 border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        className="mt-1 block w-full rounded-md outline-none p-1  border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     />
                 </label>
                 <label className="block">
@@ -65,7 +66,7 @@ const Create = () => {
                         {...register('description', { required: true })}
                         name="description"
                         type="text"
-                        className="mt-1 block w-full rounded-md outline-none p-1 bg-slate-50 border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        className="mt-1 block w-full rounded-md outline-none p-1 border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     />
                 </label>
 
@@ -77,7 +78,7 @@ const Create = () => {
                         name="category"
                         type="text"
 
-                        className="mt-1 block w-full rounded-md outline-none p-1 bg-slate-50 border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        className="mt-1 block w-full rounded-md outline-none p-1 border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                         <option value="HOME">Home</option>
                         <option value="WORK">Work</option>
@@ -107,6 +108,7 @@ const Create = () => {
                     )}
                 </button>
             </form>
+            </div>
         </div>
     )
 }

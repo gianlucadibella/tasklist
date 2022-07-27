@@ -178,3 +178,75 @@ export const CreateTaskMutation = extendType({
         })
     },
 })
+
+export const EditTaskMutation = extendType({
+    type: 'Mutation',
+    definition(t) {
+        t.nonNull.field('editTask', {
+            type: Task,
+            args: {
+                title: nonNull(stringArg()),
+                category: nonNull(stringArg()),
+                description: nonNull(stringArg()),
+                id: nonNull(stringArg()),
+                done: booleanArg()
+            },
+            async resolve(_parent, args, ctx) {
+                const user = await ctx.prisma.user.findUnique({
+                    where: {
+                        email: ctx.user.email
+                    },
+                });
+
+                if (!ctx.user) {
+                    throw new Error(`You need to be logged in to perform an action`)
+                }
+
+                const task = await ctx.prisma.task.update({
+                    where: {
+                        id: args.id
+                    },
+                    data: {
+                        title: args.title,
+                        category: args.category,
+                        description: args.description,
+                        done: args.done
+                    }
+                });
+
+                return await task
+            },
+        })
+    },
+})
+
+export const DeleteTaskMutation = extendType({
+    type: 'Mutation',
+    definition(t) {
+        t.nonNull.field('deleteTask', {
+            type: Task,
+            args: {
+                id: nonNull(stringArg())
+            },
+            async resolve(_parent, args, ctx) {
+                const user = await ctx.prisma.user.findUnique({
+                    where: {
+                        email: ctx.user.email
+                    },
+                });
+
+                if (!ctx.user) {
+                    throw new Error(`You need to be logged in to perform an action`)
+                }
+
+                const task = await ctx.prisma.task.delete({
+                    where: {
+                        id: args.id
+                    },
+                });
+
+                return args.id
+            },
+        })
+    },
+})

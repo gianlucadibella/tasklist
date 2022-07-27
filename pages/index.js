@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
@@ -22,59 +23,55 @@ query allTasksQuery($first: Int, $after: String) {
         category
         deleted
         done
-        userId
         }
     }
   }
   }
 `
 
-const userInfo = gql`
-query fetchUser{
-   user{
-    email
-    id
-    tasklist{
-      title,
-      description
-    }
-   }
-  
-}
-`
+// const userInfo = gql`
+// query fetchUser{
+//    user{
+//     email
+//     id
+//     tasklist{
+//       title,
+//       description,
+//       id
+//     }
+//    }
+
+// }
+// `
 
 
 export default function Home() {
   const { user } = useUser();
-
+  const [category, setCategory] = useState('ALL')
   const { data, error, loading, fetchMore } = useQuery(AllTaskQuery, {
     variables: {
-      first: 3
+      first: 2
     }
   });
-
-  const { data: userData } = useQuery(userInfo)
-
-  console.log(userData)
 
   if (!user) {
     return (
       <div className="h-full">
-        <div className='flex flex-col justify-center float-left w-2/3 h-full bg-gray-50'>
-    <div className='ml-32'>
-        <h1 className='font-extrabold text-left	text-transparent text-6xl bg-clip-text bg-gradient-to-r from-blue-500 to-slate-500 pb-2'>TaskList App</h1>
-        <h2 className='font-extrabold text-left	text-5xl bg-clip-text w-3/4'>Manage your tasks on a simple manner using Tasklist</h2>
-        </div>
+        <div className='flex flex-col justify-center float-left w-2/3 h-full bg-gray-50 '>
+          <div className='ml-32'>
+            <h1 className='font-extrabold text-left	text-transparent text-6xl bg-clip-text bg-gradient-to-r from-blue-500 to-slate-500 pb-2'>TaskList App</h1>
+            <h2 className='font-extrabold text-left	text-5xl bg-clip-text w-3/4'>Manage your tasks on a simple manner using Tasklist</h2>
+          </div>
         </div>
         <div className='flex flex-col justify-center items-center h-full w-1/3 bg-gray-50'>
 
-        <h1 className='font-extrabold text-9xl leading-loose drop-shadow-lg w-full text-center'>📝</h1>
-        <Link href="/api/auth/login" className='w-full text-center'>
-          <a className="block bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded  text-white font-normal text-xl">
-            Login
-          </a>
-        </Link>
-        <p>If you don't have an account <Link href="api/auth/login"><a className='underline text-blue-500 font-semibold'>Sign up</a></Link></p>
+          <h1 className='font-extrabold text-9xl leading-loose drop-shadow-lg w-full text-center'>📝</h1>
+          <Link href="/api/auth/login" className='w-full text-center'>
+            <a className="block bg-blue-500 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded  text-white font-normal text-xl">
+              Login
+            </a>
+          </Link>
+          <p>If you don't have an account <Link href="api/auth/login"><a className='underline text-blue-500 font-semibold'>Sign up</a></Link></p>
         </div>
       </div>
     );
@@ -103,20 +100,55 @@ export default function Home() {
         />
       </Head>
       <div className="container mx-auto max-w-5xl my-20 px-5">
-        {/* {data?.tasks.edges.node == 'null' ? ( */}
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ">
+          <div className='flex mb-5'>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Filter task by</label>
+            <select onChange={(e) => setCategory(e.target.value)} id="task" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option defaultValue='ALL' value="ALL" key="all">All</option>
+              <option value="HOME" key="home">Home</option>
+              <option value="WORK" key="work">Work</option>
+              <option value="OTHER" key="other">Other</option>
+            </select>
+          </div>
+
+          <h1 className='text-4xl font-semibold mb-5'>
+            Tasks
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 h-full">
             {data?.tasks.edges.map(({ node }, i) => (
-              // <Link href={`/link/${node.id}`} key={i}>
-              <TaskCard
-                title={node.title}
-                category={node.category}
-                id={node.id}
-                description={node.description}
-                done={node.done}
-                key={node.id}
-              />
-              // </Link>
+              <>
+                {(category == node.category && node.deleted == false) ? (
+                  <Link href={`/task/${node.id}`} key={i}>
+                    <a>
+                      <TaskCard
+                        title={node.title}
+                        category={node.category}
+                        id={node.id}
+                        description={node.description}
+                        done={node.done}
+                        key={node.id}
+                      />
+                    </a>
+                  </Link>
+                ) : (
+                  <>
+                    {(category == 'ALL' && node.deleted == false) && (
+                      <Link href={`/task/${node.id}`} key={i}>
+                        <a>
+                          <TaskCard
+                            title={node.title}
+                            category={node.category}
+                            id={node.id}
+                            description={node.description}
+                            done={node.done}
+                            key={node.id}
+                          />
+                        </a>
+                      </Link>
+                    )}
+                  </>
+                )}
+              </>
             ))}
           </div>
           <div>
@@ -141,27 +173,11 @@ export default function Home() {
 
             ) : (
               <p className="my-10 text-center font-medium">
-                You've reached the end!
+                No more tasks to display, <Link href="create"><a className='underline text-blue-500 font-semibold'>create one</a></Link>
               </p>
             )}
           </div>
         </>
-        {/* ) : (
-          <div className='md:ml-auto flex flex-wrap flex-col items-center text-base justify-center'>
-            <p className="my-10 text-center font-medium">
-              No tasks to display
-            </p>
-            <div className="mr-5 capitalize bg-blue-500 py-1 px-3 rounded-md text-white text-center">
-              <Link href="/create">
-                <a>
-                  + Create
-                </a>
-              </Link>
-            </div>
-
-          </div> */}
-        {/* )} */}
-
       </div>
     </div>
   )

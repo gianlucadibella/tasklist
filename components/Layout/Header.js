@@ -7,8 +7,8 @@ const Header = () => {
         <header className="text-gray-600 body-font bg-slate-100">
             <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
                 <Link href="/">
-                    <a className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-                        <span className='w-10 h-10 text-white flex justify-center items-center text-xl bg-blue-500 rounded-full'>
+                    <a className="flex title-font justify-center w-12 h-12 items-center text-gray-900 mb-4 md:mb-0 bg-blue-500 rounded-full">
+                        <span className='text-2xl ml-1'>
                         📝
                         </span>
                     </a>
